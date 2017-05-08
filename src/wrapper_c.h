@@ -7,7 +7,11 @@ void setup_network(char* cfgfile, char* weightfile);
 
 void setup_cuda();
 
-void detect(char* filename, float thresh, int* hits,
+void detect_file(char* filename, float thresh, int* hits,
             box** outboxes, float** outprobs, int** outclasses);
+
+void detect_img(void* src, float thresh, int* hits,
+            box** outboxes, float** outprobs, int** outclasses);
+
 #endif
 
