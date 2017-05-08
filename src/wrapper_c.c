@@ -15,31 +15,40 @@
 #include "image.h"
 #include "cuda.h"
 
+#include "network.h"
+
 #include "wrapper_c.h"
 
-void initialize(){
+network net;
+char** names;
 
-    cuda_set_device(0);
-}
-
-void detect(char* cfgfile, char* weightfile, char* filename, float thresh, int* hits,
-    box** outboxes, float** outprobs, int** outclasses){
-
-    float hier_thresh = 0.5;
+void setup_network(char* cfgfile, char* weightfile){
 
     // TODO: this is hardcoded in the original code. It seems to be responsible for label namesChange it to allow custom config files
     char *datacfg = "res/coco.data";
     list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
-    char **names = get_labels(name_list);
+    names = get_labels(name_list);
 
 
 
-    network net = parse_network_cfg(cfgfile);
+    net = parse_network_cfg(cfgfile);
     if (weightfile) {
         load_weights(&net, weightfile);
     }
     set_batch_network(&net, 1);
+}
+
+void setup_cuda(){
+
+    cuda_set_device(0);
+}
+
+void detect( char* filename, float thresh, int* hits,
+    box** outboxes, float** outprobs, int** outclasses){
+
+    float hier_thresh = 0.5;
+
     srand(2222222);
     clock_t time;
     char buff[256];
@@ -135,3 +144,4 @@ void detect(char* cfgfile, char* weightfile, char* filename, float thresh, int* 
     free(boxes);
     free_ptrs((void **)probs, l.w*l.h*l.n);
 }
+
